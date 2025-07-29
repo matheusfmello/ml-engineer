@@ -1,0 +1,20 @@
+FROM python:3.11-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+    apt-get install -y curl build-essential && \
+    pip install mlflow && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /mlflow_data /mlruns /mlartifacts
+
+WORKDIR /
+
+EXPOSE 5000
+
+CMD mlflow server \
+    --host 0.0.0.0 \
+    --port 5000 \
+    --default-artifact-root /mlartifacts \
+    --backend-store-uri /mlruns

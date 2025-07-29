@@ -1,0 +1,37 @@
+services:
+  # MLFlow
+  mlflow:
+    build:
+      context: .
+      dockerfile: Dockerfile.mlflow
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlflow_data:/mlflow_data
+      - ./mlruns:/mlruns
+      - ./mlartifacts:/mlartifacts
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "none"
+
+  # FastAPI
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      mlflow:
+        condition: service_healthy
+    volumes:
+      - ./mlruns:/mlruns
+      - ./mlartifacts:/mlartifacts
+      - ./mlflow_data:/mlflow_data
+    command: ["uvicorn", "src.py.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    logging:
+      driver: "none"

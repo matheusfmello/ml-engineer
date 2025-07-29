@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/942758532782988433/59618e7568f247da9d6b60a2d5c51a5b/artifacts
+end_time: 1753742604381
+entry_point_name: ''
+experiment_id: '942758532782988433'
+lifecycle_stage: active
+run_id: 59618e7568f247da9d6b60a2d5c51a5b
+run_name: capricious-fish-983
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1753742600980
+status: 3
+tags: []
+user_id: matheus

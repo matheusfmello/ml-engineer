@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/942758532782988433/a6b27b7cfb544a4cb6b50bd87890142a/artifacts
+end_time: 1753619355106
+entry_point_name: ''
+experiment_id: '942758532782988433'
+lifecycle_stage: active
+run_id: a6b27b7cfb544a4cb6b50bd87890142a
+run_name: loud-dog-744
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1753619351514
+status: 3
+tags: []
+user_id: matheus

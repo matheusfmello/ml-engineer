@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/942758532782988433/04e93c2cb7154d478365216e20d8ff0a/artifacts
+end_time: 1753619702931
+entry_point_name: ''
+experiment_id: '942758532782988433'
+lifecycle_stage: active
+run_id: 04e93c2cb7154d478365216e20d8ff0a
+run_name: burly-shoat-880
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1753619699249
+status: 3
+tags: []
+user_id: matheus
