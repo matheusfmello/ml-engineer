@@ -14,8 +14,8 @@ jobs:
         uses: docker/setup-buildx-action@v3
       - name: Build and run with docker-compose
         run: |
-          bash config/setup.sh # This should now run docker-compose up -d and exit
-      - name: Wait for services to be healthy (Recommended for FastAPI)
+          bash config/setup.sh 
+      - name: Wait for services to be healthy
         run: |
           echo "Waiting for FastAPI server to be healthy..."
           timeout 300s bash -c \
