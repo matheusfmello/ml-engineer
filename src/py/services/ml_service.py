@@ -4,6 +4,7 @@ from typing import Dict, Any
 import mlflow
 import pandas as pd
 
+
 class MLService:
     """
     A service to manage the ML model lifecycle, including loading, prediction,
@@ -17,10 +18,10 @@ class MLService:
     def load_model(self, model_uri: str):
         """
         Loads a model from the specified MLflow URI.
-        
+
         Args:
             model_uri (str): The URI of the model to load (e.g., 'models:/MyModel/1').
-        
+
         Raises:
             Exception: If the model loading fails.
         """

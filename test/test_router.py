@@ -26,6 +26,7 @@ def test_post_predict_success(mock_request, mock_ml_service, mock_db_service):
         probability=0.95
     )
 
+
 def test_post_predict_runtime_error(mock_request, mock_ml_service, mock_db_service):
     payload = MagicMock()
     payload.model_dump.return_value = {"feature": "value"}
@@ -40,6 +41,7 @@ def test_post_predict_runtime_error(mock_request, mock_ml_service, mock_db_servi
         )
     assert excinfo.value.status_code == 400
     assert "Prediction failed" in excinfo.value.detail
+
 
 def test_post_predict_unexpected_error(mock_request, mock_ml_service, mock_db_service):
     payload = MagicMock()
@@ -56,6 +58,7 @@ def test_post_predict_unexpected_error(mock_request, mock_ml_service, mock_db_se
     assert excinfo.value.status_code == 500
     assert "internal error" in excinfo.value.detail
 
+
 def test_post_load_success(mock_request, mock_ml_service):
     payload = MagicMock()
     payload.model_uri = "some/path/model.pkl"
@@ -69,6 +72,7 @@ def test_post_load_success(mock_request, mock_ml_service):
 
     assert result == {"status": "loaded"}
     mock_ml_service.load_model.assert_called_once_with("some/path/model.pkl")
+
 
 def test_get_history_success(mock_request, mock_ml_service, mock_db_service):
     mock_ml_service.model_id = "test-model-id"

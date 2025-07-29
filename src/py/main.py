@@ -11,7 +11,9 @@ from fastapi import FastAPI
 async def lifespan(app: FastAPI):
 
     load_dotenv()
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logging.basicConfig(
+        level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
     logger = logging.getLogger(__name__)
 
     app.state.logger = logger
@@ -43,7 +45,6 @@ async def lifespan(app: FastAPI):
     app.state.ml_service = ml_service
     app.state.db_service = DatabaseService(logger, db_path=os.getenv("DB_PATH"))
 
-
     # Include routers
     app.include_router(model_router, prefix="/model", tags=["Model"])
     app.include_router(health_router, prefix="/health", tags=["Health"])
@@ -60,6 +61,7 @@ app = FastAPI(
     version="0.0.1",
     lifespan=lifespan
 )
+
 
 @app.get("/", tags=["Root"])
 async def root():
