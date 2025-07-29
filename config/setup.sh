@@ -22,5 +22,5 @@ if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
     export PATH="$HOME/.local/bin:$PATH"
 fi
 
-# Run docker-compose (assumes docker is installed and user has permissions)
-docker-compose up --build
+docker-compose build
+docker-compose up -d

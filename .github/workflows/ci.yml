@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
-    branches: [main]
+    branches: [master]
 
 jobs:
   lint:
@@ -22,7 +22,7 @@ jobs:
       - name: Lint with flake8
         run: flake8 .
 
-  test:
+  unit-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -35,17 +35,35 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest
-      - name: Run tests
+      - name: Run unit tests
         run: pytest
 
-  build:
+  integration-test:
     runs-on: ubuntu-latest
+    needs: [lint, unit-test]
     steps:
       - uses: actions/checkout@v4
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Build and run with docker-compose
         run: |
-          docker-compose up --build -d
+          # Ensure your config/setup.sh runs 'docker-compose up -d'
+          bash config/setup.sh
+      - name: Wait for services to be healthy
+        run: |
+          echo "Waiting for FastAPI server to be healthy..."
+          timeout 300s bash -c \
+            'until curl -f http://localhost:8000/health; do echo "Waiting for service..."; sleep 5; done'
+          echo "FastAPI server is healthy!"
       - name: Check running containers
         run: docker-compose ps
+      - name: Run integration tests
+        run: |
+          # Example: If you have Python integration tests that hit localhost:8000
+          # pip install requests # If needed for your tests
+          # python -m pytest tests/integration/ # Or your specific integration test command
+          echo "Placeholder for integration tests. Replace with your actual test command."
+      - name: Stop Docker Compose services
+        if: always()
+        run: |
+          docker-compose down
