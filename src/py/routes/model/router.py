@@ -14,6 +14,7 @@ from .basemodels import (
 
 model_router = APIRouter()
 
+
 @model_router.post('/predict', response_model=PredictionResponse, summary="Make a prediction")
 def post_predict(
     request: Request,
@@ -32,7 +33,9 @@ def post_predict(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         logger.error(f"An unexpected error occurred during prediction: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An internal error occurred.")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An internal error occurred."
+        )
 
     db_service.insert_prediction(
         model_id=ml_service.model_id,

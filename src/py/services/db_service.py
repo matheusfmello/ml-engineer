@@ -1,7 +1,19 @@
 import logging
-import sqlite3
 from typing import List, Dict, Any
-import json 
+from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, func
+from sqlalchemy.orm import declarative_base, sessionmaker, Session
+
+Base = declarative_base()
+
+
+class Prediction(Base):
+    __tablename__ = 'predictions'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    timestamp = Column(DateTime, default=func.now())
+    model_id = Column(String, nullable=False)
+    prediction = Column(Integer)
+    probability = Column(Float)
+
 
 class DatabaseService:
     """
@@ -10,26 +22,16 @@ class DatabaseService:
     def __init__(self, logger: logging.Logger, db_path: str = "database/predictions.db"):
         self.logger = logger
         self.db_path = db_path
+        self.engine = create_engine(f"sqlite:///{self.db_path}", echo=False, future=True)
+        self.SessionLocal = sessionmaker(bind=self.engine, expire_on_commit=False)
         self._initialize_db()
 
     def _initialize_db(self):
         """Initializes the SQLite database and creates the predictions table."""
         try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS predictions (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    model_id TEXT NOT NULL,
-                    prediction INTEGER,
-                    probability REAL
-                )
-            """)
-            conn.commit()
-            conn.close()
+            Base.metadata.create_all(self.engine)
             self.logger.info(f"SQLite database initialized at {self.db_path}")
-        except sqlite3.Error as e:
+        except Exception as e:
             self.logger.error(f"Error initializing database: {e}")
             raise
 
@@ -38,22 +40,22 @@ class DatabaseService:
         Inserts a new prediction record into the database.
 
         Args:
-            model_id (Dict[str, Any]): The input data used for prediction.
+            model_id (str): The model identifier.
             prediction (int): The predicted value.
-            probability (float, optional): The probability associated with the prediction. Defaults to None.
+            probability (float, optional): The probability associated with the prediction.
+            Defaults to None.
         """
+        session: Session = self.SessionLocal()
         try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            cursor.execute(
-                "INSERT INTO predictions (model_id, prediction, probability) VALUES (?, ?, ?)",
-                (model_id, prediction, probability)
-            )
-            conn.commit()
-            conn.close()
+            pred = Prediction(model_id=model_id, prediction=prediction, probability=probability)
+            session.add(pred)
+            session.commit()
             self.logger.info("Prediction stored in database.")
-        except sqlite3.Error as e:
+        except Exception as e:
+            session.rollback()
             self.logger.error(f"Error storing prediction in database: {e}")
+        finally:
+            session.close()
 
     def get_history(self, model_id) -> List[Dict[str, Any]]:
         """
@@ -64,36 +66,26 @@ class DatabaseService:
         """
         self.logger.info("Retrieving prediction history from database.")
         history_records = []
+        session: Session = self.SessionLocal()
         try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            cursor.execute(
-                """
-                SELECT timestamp, model_id, prediction, probability
-                FROM predictions
-                WHERE model_id = ?
-                ORDER BY timestamp DESC
-                """,
-                (model_id,)
+            results = (
+                session.query(Prediction)
+                .filter_by(model_id=model_id)
+                .order_by(Prediction.timestamp.desc())
+                .all()
             )
-            rows = cursor.fetchall()
-            conn.close()
-
-            for row in rows:
-                timestamp, model_id, prediction, probability = row
+            for row in results:
                 history_records.append(
                     {
-                        "timestamp": timestamp,
-                        "model_id": model_id,
-                        "prediction": prediction,
-                        "probability": probability
+                        "timestamp": row.timestamp.isoformat() if row.timestamp else None,
+                        "model_id": row.model_id,
+                        "prediction": row.prediction,
+                        "probability": row.probability
                     }
                 )
-        except sqlite3.Error as e:
-            self.logger.error(f"Error retrieving history from database: {e}")
-        except json.JSONDecodeError as e:
-            self.logger.error(f"Error decoding JSON from database history: {e}")
         except Exception as e:
-            self.logger.error(f"An unexpected error occurred while getting history: {e}")
+            self.logger.error(f"Error retrieving history from database: {e}")
+        finally:
+            session.close()
 
         return history_records

@@ -1,7 +1,8 @@
 fastapi
-uvicorn
-python-dotenv
+flake8
 mlflow
 scikit-learn
+uvicorn
 pandas
 pytest
+python-dotenv

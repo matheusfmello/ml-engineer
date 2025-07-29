@@ -20,7 +20,8 @@ services:
 
   # FastAPI
   app:
-    build: .
+    build:
+      dockerfile: Dockerfile.app
     ports:
       - "8000:8000"
     env_file:

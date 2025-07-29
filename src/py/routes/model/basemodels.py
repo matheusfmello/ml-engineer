@@ -10,11 +10,20 @@ class PredictionInput(BaseModel):
     sibsp: int = Field(..., description="Number of siblings/spouses aboard", example=1)
     parch: int = Field(..., description="Number of parents/children aboard", example=0)
     fare: float = Field(..., description="Passenger fare", example=7.25)
-    embarked: str = Field(..., description="Port of Embarkation (C=Cherbourg, Q=Queenstown, S=Southampton)", example="S")
+    embarked: str = Field(
+        ...,
+        description="""Port of Embarkation (C=Cherbourg, Q=Queenstown, S=Southampton)""",
+        example="S"
+    )
+
 
 class LoadRequest(BaseModel):
     """Request to load a new model from MLFlow."""
-    model_uri: str = Field(..., description="MLflow model URI (e.g., 'models:/MyModel/production')", example="models:/TitanicSurvival/production")
+    model_uri: str = Field(
+        ...,
+        description="MLflow model URI (e.g., 'models:/MyModel/production')",
+        example="models:/TitanicSurvival/4"
+    )
 
 
 class PredictionResponse(BaseModel):
@@ -22,10 +31,12 @@ class PredictionResponse(BaseModel):
     prediction: int
     probability: Optional[float]
 
+
 class LoadResponse(BaseModel):
     """Confirmation response for loading a model."""
     message: str = "Model loaded successfully"
     model_uri: str
+
 
 class HistoryItem(BaseModel):
     """A single entry in the prediction history."""
@@ -33,6 +44,7 @@ class HistoryItem(BaseModel):
     model_id: str
     prediction: int
     probability: float
+
 
 class HistoryResponse(BaseModel):
     """Response containing the list of all predictions made."""
