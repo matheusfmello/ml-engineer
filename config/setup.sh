@@ -23,4 +23,4 @@ if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
 fi
 
 docker-compose build
-docker-compose up -d
+docker-compose up
